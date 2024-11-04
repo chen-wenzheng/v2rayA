@@ -7,7 +7,6 @@ import (
 	"os/signal"
 	"path/filepath"
 	"runtime"
-	"sync"
 	"syscall"
 	"time"
 
@@ -221,26 +220,36 @@ func hello() {
 	log.Alert("Starting...")
 }
 
+var first = true
+
 func updateSubscriptions() {
 	subs := configure.GetSubscriptions()
-	lenSubs := len(subs)
-	control := make(chan struct{}, 2) //并发限制同时更新2个订阅
-	wg := new(sync.WaitGroup)
-	for i := 0; i < lenSubs; i++ {
-		wg.Add(1)
-		go func(i int) {
-			control <- struct{}{}
-			err := service.UpdateSubscription(i, false)
-			if err != nil {
-				log.Info("[AutoUpdate] Subscriptions: Failed to update subscription -- ID: %d，err: %v", i, err)
-			} else {
-				log.Info("[AutoUpdate] Subscriptions: Complete updating subscription -- ID: %d，Address: %s", i, subs[i].Address)
-			}
-			wg.Done()
-			<-control
-		}(i)
+	for i, sub := range subs {
+		err := service.UpdateSubscription(i, false)
+		if err != nil {
+			log.Info("[AutoUpdate] Subscriptions: Failed to update subscription -- ID: %d，err: %v", i, err)
+		} else {
+			log.Info("[AutoUpdate] Subscriptions: Complete updating subscription -- ID: %d，Address: %s", i, sub.Address)
+		}
+		if first {
+			continue
+		}
+		ws := make([]*configure.Which, 0, len(sub.Servers))
+		for j := 0; j < len(sub.Servers); j++ {
+			ws = append(ws, &configure.Which{
+				TYPE: "subscriptionServer",
+				ID:   j,
+				Sub:  i,
+			})
+		}
+		_, err = service.TestHttpLatency(ws, 8*time.Second, 32, false, service.HttpTestURL)
+		if err != nil {
+			log.Error("更新延迟: %v", err)
+		}
 	}
-	wg.Wait()
+	if first {
+		first = !first
+	}
 }
 
 func initUpdatingTicker() {
@@ -300,19 +309,19 @@ func checkUpdate() {
 		go updateSubscriptions()
 	}
 	// 检查服务端更新
-	go func() {
-		f := func() {
-			if foundNew, remote, err := service.CheckUpdate(); err == nil {
-				conf.FoundNew = foundNew
-				conf.RemoteVersion = remote
-			}
-		}
-		f()
-		c := time.Tick(7 * 24 * time.Hour)
-		for range c {
-			f()
-		}
-	}()
+	// go func() {
+	// 	f := func() {
+	// 		if foundNew, remote, err := service.CheckUpdate(); err == nil {
+	// 			conf.FoundNew = foundNew
+	// 			conf.RemoteVersion = remote
+	// 		}
+	// 	}
+	// 	f()
+	// 	c := time.Tick(7 * 24 * time.Hour)
+	// 	for range c {
+	// 		f()
+	// 	}
+	// }()
 }
 
 func run() (err error) {

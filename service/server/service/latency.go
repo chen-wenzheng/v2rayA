@@ -6,6 +6,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -94,6 +95,7 @@ func addHosts(tmpl *v2ray.Template, vms []serverObj.ServerObj) {
 }
 
 func TestHttpLatency(which []*configure.Which, timeout time.Duration, maxParallel int, showLog bool, customTestUrl string) ([]*configure.Which, error) {
+	log.Info("Testing latency")
 	var whiches = configure.NewWhiches(which)
 	for i := len(which) - 1; i >= 0; i-- {
 		if which[i].TYPE == configure.SubscriptionType { //去掉subscriptionType
@@ -242,6 +244,44 @@ func TestHttpLatency(which []*configure.Which, timeout time.Duration, maxParalle
 	}
 	if err := configure.NewWhiches(which).SaveLatencies(); err != nil {
 		return nil, fmt.Errorf("failed to save the latency test result: %v", err)
+	}
+	for _, c := range configure.GetConnectedServers().Get() {
+		log.Info("disconnecting %v", c.ID)
+		err = Disconnect(*c, false)
+		if err != nil {
+			log.Error("failed to disconnect: %v", err)
+			continue
+		}
+	}
+	wmin := slices.MinFunc(which, func(a, b *configure.Which) int {
+		al, af := strings.CutSuffix(a.Latency, "ms")
+		bl, bf := strings.CutSuffix(b.Latency, "ms")
+		switch {
+		case !af && !bf:
+			return 0
+		case !af:
+			return 0
+		case !bf:
+			return -1
+		}
+		ai, err := strconv.Atoi(al)
+		if err != nil {
+			return 0
+		}
+		bi, err := strconv.Atoi(bl)
+		if err != nil {
+			return -1
+		}
+		return ai - bi
+	})
+	log.Info("connecting %v", wmin.ID)
+	err = Connect(wmin)
+	if err != nil {
+		return nil, fmt.Errorf("连接到延迟最小服务: %w", err)
+	}
+	err = StartV2ray()
+	if err != nil {
+		return nil, fmt.Errorf("启动v2ray: %w", err)
 	}
 	return which, nil
 }

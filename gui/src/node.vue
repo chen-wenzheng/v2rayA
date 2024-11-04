@@ -1,46 +1,21 @@
 <template>
   <section id="node-section" class="node-section container hero">
-    <b-sidebar
-      v-show="connectedServerInfo.length"
-      :open="true"
-      class="node-status-sidebar-reduced"
-      :can-cancel="false"
-      @mouseenter.native="showSidebar = true"
-      @click.native="showSidebar = true"
-    >
+    <b-sidebar v-show="connectedServerInfo.length" :open="true" class="node-status-sidebar-reduced" :can-cancel="false"
+      @mouseenter.native="showSidebar = true" @click.native="showSidebar = true">
       <img src="@/assets/img/switch-menu.svg" width="36px" />
     </b-sidebar>
-    <b-sidebar
-      :open="showSidebar"
-      type="is-light"
-      :fullheight="false"
-      :fullwidth="false"
-      :overlay="false"
-      :right="false"
-      class="node-status-sidebar"
-      :can-cancel="['outside']"
-      @close="showSidebar = false"
-      @mouseleave.native="showSidebar = false"
-    >
-      <b-message
-        v-for="v of connectedServerInfo"
-        :key="v.value"
-        :title="`${v.info.name}${
-          v.info.subscription_name ? ` [${v.info.subscription_name}]` : ''
-        }`"
-        :closable="false"
-        size="is-small"
-        :type="
-          v.info.alive
-            ? v.selected
-              ? 'is-primary'
-              : 'is-success'
-            : v.info.alive === null
+    <b-sidebar :open="showSidebar" type="is-light" :fullheight="false" :fullwidth="false" :overlay="false"
+      :right="false" class="node-status-sidebar" :can-cancel="['outside']" @close="showSidebar = false"
+      @mouseleave.native="showSidebar = false">
+      <b-message v-for="v of connectedServerInfo" :key="v.value" :title="`${v.info.name}${v.info.subscription_name ? ` [${v.info.subscription_name}]` : ''
+        }`" :closable="false" size="is-small" :type="v.info.alive
+          ? v.selected
+            ? 'is-primary'
+            : 'is-success'
+          : v.info.alive === null
             ? 'is-light'
             : 'is-danger'
-        "
-        @click.native="handleClickConnectedServer(v.which)"
-      >
+          " @click.native="handleClickConnectedServer(v.which)">
         <div v-if="v.showContent">
           <p>{{ $t("server.protocol") }}: {{ v.info.net }}</p>
           <p v-if="v.info.delay && v.info.delay < 99999">
@@ -58,108 +33,81 @@
       </b-message>
     </b-sidebar>
     <div v-if="ready" class="hero-body">
-      <b-field
-        id="toolbar"
-        grouped
-        group-multiline
-        :style="{
-          background: overHeight
-            ? isCheckedRowsPingable() || isCheckedRowsDeletable()
-              ? 'rgba(0, 0, 0, 0.1)'
-              : 'rgba(0, 0, 0, 0.05)'
-            : 'transparent',
-        }"
-        :class="{ 'float-toolbar': overHeight }"
-      >
+      <b-field id="toolbar" grouped group-multiline :style="{
+        background: overHeight
+          ? isCheckedRowsPingable() || isCheckedRowsDeletable()
+            ? 'rgba(0, 0, 0, 0.1)'
+            : 'rgba(0, 0, 0, 0.05)'
+          : 'transparent',
+      }" :class="{ 'float-toolbar': overHeight }">
         <div style="max-width: 60%">
-          <button
-            :class="{
-              button: true,
-              field: true,
-              'is-info': true,
-              'mobile-small': true,
-              'not-display': !overHeight && !isCheckedRowsPingable(),
-            }"
-            :disabled="!isCheckedRowsPingable()"
-            @click="handleClickLatency(true)"
-          >
+          <button :class="{
+            button: true,
+            field: true,
+            'is-info': true,
+            'mobile-small': true,
+            'not-display': !overHeight && !isCheckedRowsPingable(),
+          }" :disabled="!isCheckedRowsPingable()" @click="handleClickLatency(true)">
             <i class="iconfont icon-wave" />
             <span>PING</span>
           </button>
-          <button
-            :class="{
-              button: true,
-              field: true,
-              'is-info': true,
-              'mobile-small': true,
-              'not-display': !overHeight && !isCheckedRowsPingable(),
-            }"
-            :disabled="!isCheckedRowsPingable()"
-            @click="handleClickLatency(false)"
-          >
+          <button :class="{
+            button: true,
+            field: true,
+            'is-info': true,
+            'mobile-small': true,
+            'not-display': !overHeight && !isCheckedRowsPingable(),
+          }" :disabled="!isCheckedRowsPingable()" @click="handleClickLatency(false)">
             <i class="iconfont icon-wave" />
             <span>HTTP</span>
           </button>
-          <button
-            :class="{
-              button: true,
-              field: true,
-              'is-delete': true,
-              'mobile-small': true,
-              'not-display': !overHeight && !isCheckedRowsDeletable(),
-            }"
-            :disabled="!isCheckedRowsDeletable()"
-            @click="handleClickDelete"
-          >
+          <button :class="{
+            button: true,
+            field: true,
+            'is-delete': true,
+            'mobile-small': true,
+            'not-display': !overHeight && !isCheckedRowsDeletable(),
+          }" :disabled="!isCheckedRowsDeletable()" @click="handleClickDelete">
             <i class="iconfont icon-delete" />
             <span>{{ $t("operations.delete") }}</span>
           </button>
-          <button
-            :class="{
-              button: true,
-              field: true,
-              'is-delete': true,
-              'mobile-small': true,
-              'not-show': true,
-            }"
-          >
+          <button :class="{
+            button: true,
+            field: true,
+            'is-info': true,
+            'mobile-small': true,
+            'not-display': !overHeight && !isCheckedRowsDeletable(),
+          }" :disabled="!isCheckedRowsDeletable()" @click="handleClickSubUpdate">
+            <i class="iconfont icon-wave" />
+            <span> 更新 </span>
+          </button>
+          <button :class="{
+            button: true,
+            field: true,
+            'is-delete': true,
+            'mobile-small': true,
+            'not-show': true,
+          }">
             <i class="iconfont icon-delete" />
             <span>placeholder</span>
           </button>
           <span class="field not-show mobile-small">placeholder</span>
         </div>
         <div class="right">
-          <b-button
-            class="field mobile-small"
-            type="is-primary"
-            @click="handleClickCreate"
-          >
+          <b-button class="field mobile-small" type="is-primary" @click="handleClickCreate">
             <i class="iconfont icon-chuangjiangongdan1" />
             <span>{{ $t("operations.create") }}</span>
           </b-button>
-          <b-button
-            class="field mobile-small"
-            type="is-primary"
-            @click="handleClickImport"
-          >
+          <b-button class="field mobile-small" type="is-primary" @click="handleClickImport">
             <i class="iconfont icon-daoruzupu-xianxing" />
             <span>{{ $t("operations.import") }}</span>
           </b-button>
         </div>
       </b-field>
 
-      <b-collapse
-        v-if="!tableData.subscriptions.length && !tableData.servers.length"
-        class="card welcome-driver"
-        aria-id="contentIdForA11y3"
-      >
-        <div
-          slot="trigger"
-          slot-scope="props"
-          class="card-header"
-          role="button"
-          aria-controls="contentIdForA11y3"
-        >
+      <b-collapse v-if="!tableData.subscriptions.length && !tableData.servers.length" class="card welcome-driver"
+        aria-id="contentIdForA11y3">
+        <div slot="trigger" slot-scope="props" class="card-header" role="button" aria-controls="contentIdForA11y3">
           <p class="card-header-title">
             {{ $t("welcome.title") }}
           </p>
@@ -176,112 +124,53 @@
         <footer class="card-footer">
           <a class="card-footer-item" @click="handleClickCreate">{{
             $t("operations.create")
-          }}</a>
+            }}</a>
           <a class="card-footer-item" @click="handleClickImport">{{
             $t("operations.import")
-          }}</a>
+            }}</a>
         </footer>
       </b-collapse>
-      <b-tabs
-        v-if="tableData.subscriptions.length || tableData.servers.length"
-        v-model="tab"
-        position="is-centered"
-        type="is-toggle-rounded"
-        class="main-tabs"
-        @input="handleTabsChange"
-      >
+      <b-tabs v-if="tableData.subscriptions.length || tableData.servers.length" v-model="tab" position="is-centered"
+        type="is-toggle-rounded" class="main-tabs" @input="handleTabsChange">
         <b-tab-item label="SUBSCRIPTION">
           <b-field :label="`SUBSCRIPTION(${tableData.subscriptions.length})`">
-            <b-table
-              :data="tableData.subscriptions"
-              :checked-rows.sync="checkedRows"
-              :row-class="
-                (row, index) =>
-                  row.connected &&
-                  runningState.running === $t('common.isRunning')
-                    ? 'is-connected-running'
-                    : row.connected
-                    ? 'is-connected-not-running'
-                    : null
-              "
-              default-sort="id"
-              checkable
-            >
-              <b-table-column
-                v-slot="props"
-                field="id"
-                label="ID"
-                numeric
-                sortable
-              >
+            <b-table :data="tableData.subscriptions" :checked-rows.sync="checkedRows" :row-class="(row, index) =>
+              row.connected &&
+                runningState.running === $t('common.isRunning')
+                ? 'is-connected-running'
+                : row.connected
+                  ? 'is-connected-not-running'
+                  : null
+              " default-sort="id" checkable>
+              <b-table-column v-slot="props" field="id" label="ID" numeric sortable>
                 {{ props.row.id }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="host"
-                :label="$t('subscription.host')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="host" :label="$t('subscription.host')" sortable>
                 {{ props.row.host }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="remarks"
-                :label="$t('subscription.remarks')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="remarks" :label="$t('subscription.remarks')" sortable>
                 {{ props.row.remarks }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="status"
-                :label="$t('subscription.timeLastUpdate')"
-                width="260"
-                sortable
-              >
+              <b-table-column v-slot="props" field="status" :label="$t('subscription.timeLastUpdate')" width="260"
+                sortable>
                 {{ props.row.status }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                :label="$t('subscription.numberServers')"
-                centered
-                numeric
-                sortable
-                :custom-sort="sortNumberServers"
-              >
+              <b-table-column v-slot="props" :label="$t('subscription.numberServers')" centered numeric sortable
+                :custom-sort="sortNumberServers">
                 {{ props.row.servers.length }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                :label="$t('operations.name')"
-                width="300"
-              >
+              <b-table-column v-slot="props" :label="$t('operations.name')" width="300">
                 <div class="operate-box">
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-sync"
-                    outlined
-                    type="is-warning"
-                    @click="handleClickUpdateSubscription(props.row)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-sync" outlined type="is-warning"
+                    @click="handleClickUpdateSubscription(props.row)">
                     {{ $t("operations.update") }}
                   </b-button>
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-wendangxiugai"
-                    outlined
-                    type="is-info"
-                    @click="handleClickModifySubscription(props.row)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-wendangxiugai" outlined
+                    type="is-info" @click="handleClickModifySubscription(props.row)">
                     {{ $t("operations.modify") }}
                   </b-button>
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-share"
-                    outlined
-                    type="is-success"
-                    @click="handleClickShare(props.row)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-share" outlined type="is-success"
+                    @click="handleClickShare(props.row)">
                     {{ $t("operations.share") }}
                   </b-button>
                 </div>
@@ -289,128 +178,65 @@
             </b-table>
           </b-field>
         </b-tab-item>
-        <b-tab-item
-          label="SERVER"
-          :icon="`${
-            connectedServerInTab['server'] ? ' iconfont icon-dian' : ''
-          }`"
-        >
+        <b-tab-item label="SERVER" :icon="`${connectedServerInTab['server'] ? ' iconfont icon-dian' : ''
+          }`">
           <b-field :label="`SERVER(${tableData.servers.length})`">
-            <b-table
-              per-page="100"
-              :current-page.sync="currentPage.servers"
-              :data="tableData.servers"
-              :checked-rows.sync="checkedRows"
-              checkable
-              :row-class="
-                (row, index) =>
-                  row.connected &&
+            <b-table per-page="100" :current-page.sync="currentPage.servers" :data="tableData.servers"
+              :checked-rows.sync="checkedRows" checkable :row-class="(row, index) =>
+                row.connected &&
                   runningState.running === $t('common.isRunning')
-                    ? 'is-connected-running'
-                    : row.connected
+                  ? 'is-connected-running'
+                  : row.connected
                     ? 'is-connected-not-running'
                     : null
-              "
-              default-sort="id"
-            >
-              <b-table-column
-                v-slot="props"
-                field="id"
-                label="ID"
-                numeric
-                sortable
-              >
+                " default-sort="id">
+              <b-table-column v-slot="props" field="id" label="ID" numeric sortable>
                 {{ props.row.id }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="name"
-                :label="$t('server.name')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="name" :label="$t('server.name')" sortable>
                 {{ props.row.name }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="address"
-                :label="$t('server.address')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="address" :label="$t('server.address')" sortable>
                 <p class="address-column" :title="props.row.address">
                   {{ props.row.address }}
                 </p>
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="net"
-                :label="$t('server.protocol')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="net" :label="$t('server.protocol')" sortable>
                 {{ props.row.net }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="pingLatency"
-                :label="$t('server.latency')"
-                class="ping-latency"
-                sortable
-                :custom-sort="sortping"
-              >
-                <p
-                  :class="{
-                    'latency-column': true,
-                    'latency-valid': props.row.pingLatency.endsWith('ms'),
-                  }"
-                  :title="props.row.pingLatency"
-                >
+              <b-table-column v-slot="props" field="pingLatency" :label="$t('server.latency')" class="ping-latency"
+                sortable :custom-sort="sortping">
+                <p :class="{
+                  'latency-column': true,
+                  'latency-valid': props.row.pingLatency.endsWith('ms'),
+                }" :title="props.row.pingLatency">
                   {{ props.row.pingLatency }}
                 </p>
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                :label="$t('operations.name')"
-                sortable
-                :custom-sort="sortConnections"
-                width="300"
-              >
+              <b-table-column v-slot="props" :label="$t('operations.name')" sortable :custom-sort="sortConnections"
+                width="300">
                 <div class="operate-box">
-                  <b-button
-                    size="is-small"
-                    :icon-left="` github-circle iconfont ${
-                      props.row.connected
-                        ? 'icon-Link_disconnect'
-                        : 'icon-lianjie'
-                    }`"
-                    :outlined="!props.row.connected"
-                    :type="props.row.connected ? 'is-warning' : 'is-warning'"
-                    @click="handleClickAboutConnection(props.row)"
-                  >
+                  <b-button size="is-small" :icon-left="` github-circle iconfont ${props.row.connected
+                    ? 'icon-Link_disconnect'
+                    : 'icon-lianjie'
+                    }`" :outlined="!props.row.connected" :type="props.row.connected ? 'is-warning' : 'is-warning'"
+                    @click="handleClickAboutConnection(props.row)">
                     {{
                       loadBalanceValid
                         ? props.row.connected
                           ? $t("operations.cancel")
                           : $t("operations.select")
                         : props.row.connected
-                        ? $t("operations.disconnect")
-                        : $t("operations.connect")
+                          ? $t("operations.disconnect")
+                          : $t("operations.connect")
                     }}
                   </b-button>
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-wendangxiugai"
-                    :outlined="!props.row.connected"
-                    type="is-info"
-                    @click="handleClickModifyServer(props.row)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-wendangxiugai"
+                    :outlined="!props.row.connected" type="is-info" @click="handleClickModifyServer(props.row)">
                     {{ $t("operations.modify") }}
                   </b-button>
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-share"
-                    :outlined="!props.row.connected"
-                    type="is-success"
-                    @click="handleClickShare(props.row)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-share"
+                    :outlined="!props.row.connected" type="is-success" @click="handleClickShare(props.row)">
                     {{ $t("operations.share") }}
                   </b-button>
                 </div>
@@ -418,140 +244,70 @@
             </b-table>
           </b-field>
         </b-tab-item>
-        <b-tab-item
-          v-for="(sub, subi) of tableData.subscriptions"
-          :key="sub.id"
-          :label="
-            (sub.remarks && sub.remarks.toUpperCase()) || sub.host.toUpperCase()
-          "
-          :icon="`${
-            connectedServerInTab['subscriptionServer'][subi]
-              ? ' iconfont icon-dian'
-              : ''
-          }`"
-        >
-          <b-field
-            v-if="tab === subi + 2"
-            :label="`${sub.host.toUpperCase()}(${sub.servers.length}${
-              sub.info ? ') (' : ''
-            }${sub.info})`"
-          >
-            <b-table
-              :current-page.sync="currentPage[sub.id]"
-              per-page="100"
-              :data="sub.servers"
-              :checked-rows.sync="checkedRows"
-              checkable
-              :row-class="
-                (row, index) =>
-                  row.connected &&
+        <b-tab-item v-for="(sub, subi) of tableData.subscriptions" :key="sub.id" :label="(sub.remarks && sub.remarks.toUpperCase()) || sub.host.toUpperCase()
+          " :icon="`${connectedServerInTab['subscriptionServer'][subi]
+            ? ' iconfont icon-dian'
+            : ''
+            }`">
+          <b-field v-if="tab === subi + 2" :label="`${sub.host.toUpperCase()}(${sub.servers.length}${sub.info ? ') (' : ''
+            }${sub.info})`">
+            <b-table :current-page.sync="currentPage[sub.id]" per-page="100" :data="sub.servers"
+              :checked-rows.sync="checkedRows" checkable :row-class="(row, index) =>
+                row.connected &&
                   runningState.running === $t('common.isRunning')
-                    ? 'is-connected-running'
-                    : row.connected
+                  ? 'is-connected-running'
+                  : row.connected
                     ? 'is-connected-not-running'
                     : null
-              "
-              default-sort="id"
-            >
-              <b-table-column
-                v-slot="props"
-                field="id"
-                label="ID"
-                numeric
-                sortable
-              >
+                " default-sort="id">
+              <b-table-column v-slot="props" field="id" label="ID" numeric sortable>
                 {{ props.row.id }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="name"
-                :label="$t('server.name')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="name" :label="$t('server.name')" sortable>
                 {{ props.row.name }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="address"
-                :label="$t('server.address')"
-                sortable
-              >
+              <b-table-column v-slot="props" field="address" :label="$t('server.address')" sortable>
                 <p class="address-column" :title="props.row.address">
                   {{ props.row.address }}
                 </p>
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="net"
-                :label="$t('server.protocol')"
-                style="font-size: 0.9em"
-                sortable
-              >
+              <b-table-column v-slot="props" field="net" :label="$t('server.protocol')" style="font-size: 0.9em"
+                sortable>
                 {{ props.row.net }}
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                field="pingLatency"
-                :label="$t('server.latency')"
-                class="ping-latency"
-                sortable
-                :custom-sort="sortping"
-              >
-                <p
-                  :class="{
-                    'latency-column': true,
-                    'latency-valid': props.row.pingLatency.endsWith('ms'),
-                  }"
-                  :title="props.row.pingLatency"
-                >
+              <b-table-column v-slot="props" field="pingLatency" :label="$t('server.latency')" class="ping-latency"
+                sortable :custom-sort="sortping">
+                <p :class="{
+                  'latency-column': true,
+                  'latency-valid': props.row.pingLatency.endsWith('ms'),
+                }" :title="props.row.pingLatency">
                   {{ props.row.pingLatency }}
                 </p>
               </b-table-column>
-              <b-table-column
-                v-slot="props"
-                :label="$t('operations.name')"
-                sortable
-                :custom-sort="sortConnections"
-                width="300"
-              >
+              <b-table-column v-slot="props" :label="$t('operations.name')" sortable :custom-sort="sortConnections"
+                width="300">
                 <div class="operate-box">
-                  <b-button
-                    size="is-small"
-                    :icon-left="` github-circle iconfont ${
-                      props.row.connected
-                        ? 'icon-Link_disconnect'
-                        : 'icon-lianjie'
-                    }`"
-                    :outlined="!props.row.connected"
-                    :type="props.row.connected ? 'is-warning' : 'is-warning'"
-                    @click="handleClickAboutConnection(props.row, subi)"
-                  >
+                  <b-button size="is-small" :icon-left="` github-circle iconfont ${props.row.connected
+                    ? 'icon-Link_disconnect'
+                    : 'icon-lianjie'
+                    }`" :outlined="!props.row.connected" :type="props.row.connected ? 'is-warning' : 'is-warning'"
+                    @click="handleClickAboutConnection(props.row, subi)">
                     {{
                       loadBalanceValid
                         ? props.row.connected
                           ? $t("operations.cancel")
                           : $t("operations.select")
                         : props.row.connected
-                        ? $t("operations.disconnect")
-                        : $t("operations.connect")
+                          ? $t("operations.disconnect")
+                          : $t("operations.connect")
                     }}
                   </b-button>
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-winfo-icon-chakanbaogao"
-                    :outlined="!props.row.connected"
-                    type="is-info"
-                    @click="handleClickViewServer(props.row, subi)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-winfo-icon-chakanbaogao"
+                    :outlined="!props.row.connected" type="is-info" @click="handleClickViewServer(props.row, subi)">
                     {{ $t("operations.view") }}
                   </b-button>
-                  <b-button
-                    size="is-small"
-                    icon-left=" github-circle iconfont icon-share"
-                    :outlined="!props.row.connected"
-                    type="is-success"
-                    @click="handleClickShare(props.row, subi)"
-                  >
+                  <b-button size="is-small" icon-left=" github-circle iconfont icon-share"
+                    :outlined="!props.row.connected" type="is-success" @click="handleClickShare(props.row, subi)">
                     {{ $t("operations.share") }}
                   </b-button>
                 </div>
@@ -564,139 +320,67 @@
     <b-loading v-else :is-full-page="true" :active="true">
       <i class="iconfont icon-loading_ico-copy" />
     </b-loading>
-    <b-modal
-      :active.sync="showModalServer"
-      has-modal-card
-      trap-focus
-      aria-role="dialog"
-      aria-modal
-    >
-      <ModalServer
-        :which="which"
-        :readonly="modalServerReadOnly"
-        @submit="handleModalServerSubmit"
-      />
+    <b-modal :active.sync="showModalServer" has-modal-card trap-focus aria-role="dialog" aria-modal>
+      <ModalServer :which="which" :readonly="modalServerReadOnly" @submit="handleModalServerSubmit" />
     </b-modal>
-    <b-modal
-      :active.sync="showModalSubscription"
-      has-modal-card
-      trap-focus
-      aria-role="dialog"
-      aria-modal
-    >
-      <ModalSubscription
-        :which="which"
-        @submit="handleModalSubscriptionSubmit"
-      />
+    <b-modal :active.sync="showModalSubscription" has-modal-card trap-focus aria-role="dialog" aria-modal>
+      <ModalSubscription :which="which" @submit="handleModalSubscriptionSubmit" />
     </b-modal>
-    <input
-      id="QRCodeImport"
-      type="file"
-      style="display: none"
-      accept="image/*"
-    />
-    <b-modal
-      :active.sync="showModalImport"
-      has-modal-card
-      trap-focus
-      aria-role="dialog"
-      aria-modal
-      @after-enter="handleModalImportShow"
-    >
+    <input id="QRCodeImport" type="file" style="display: none" accept="image/*" />
+    <b-modal :active.sync="showModalImport" has-modal-card trap-focus aria-role="dialog" aria-modal
+      @after-enter="handleModalImportShow">
       <div class="modal-card" style="width: 350px">
         <header class="modal-card-head">
           <p class="modal-card-title">{{ $t("operations.import") }}</p>
         </header>
         <section class="modal-card-body">
           {{ $t("import.message") }}
-          <b-input
-            ref="importInput"
-            v-model="importWhat"
-            icon-right=" iconfont icon-camera"
-            icon-right-clickable
-            @icon-right-click="handleClickImportQRCode"
-            @keyup.native="handleImportEnter"
-          ></b-input>
+          <b-input ref="importInput" v-model="importWhat" icon-right=" iconfont icon-camera" icon-right-clickable
+            @icon-right-click="handleClickImportQRCode" @keyup.native="handleImportEnter"></b-input>
         </section>
         <footer class="modal-card-foot">
-          <button
-            class="button is-link is-light"
-            type="button"
-            @click="handleClickImportInBatch"
-          >
+          <button class="button is-link is-light" type="button" @click="handleClickImportInBatch">
             {{ $t("operations.inBatch") }}
           </button>
-          <div
-            style="
+          <div style="
               display: flex;
               justify-content: flex-end;
               width: -moz-available;
-            "
-          >
-            <button
-              class="button"
-              type="button"
-              @click="showModalImport = false"
-            >
+            ">
+            <button class="button" type="button" @click="showModalImport = false">
               {{ $t("operations.cancel") }}
             </button>
-            <button
-              class="button is-primary"
-              type="button"
-              @click="handleClickImportConfirm"
-            >
+            <button class="button is-primary" type="button" @click="handleClickImportConfirm">
               {{ $t("operations.confirm") }}
             </button>
           </div>
         </footer>
       </div>
     </b-modal>
-    <b-modal
-      :active.sync="showModalImportInBatch"
-      has-modal-card
-      trap-focus
-      aria-role="dialog"
-      aria-modal
-      @close="showModalImport = false"
-    >
+    <b-modal :active.sync="showModalImportInBatch" has-modal-card trap-focus aria-role="dialog" aria-modal
+      @close="showModalImport = false">
       <div class="modal-card" style="width: 350px">
         <header class="modal-card-head">
           <p class="modal-card-title">{{ $t("operations.import") }}</p>
         </header>
         <section class="modal-card-body">
           {{ $t("import.batchMessage") }}
-          <b-input
-            ref="importInput"
-            v-model="importWhat"
-            type="textarea"
-            custom-class="horizon-scroll"
-          ></b-input>
+          <b-input ref="importInput" v-model="importWhat" type="textarea" custom-class="horizon-scroll"></b-input>
         </section>
         <footer class="modal-card-foot">
-          <div
-            style="
+          <div style="
               display: flex;
               justify-content: flex-end;
               width: -moz-available;
-            "
-          >
-            <button
-              class="button"
-              type="button"
-              @click="
-                () => {
-                  showModalImport = false;
-                  showModalImportInBatch = false;
-                }
-              "
-            >
+            ">
+            <button class="button" type="button" @click="() => {
+              showModalImport = false;
+              showModalImportInBatch = false;
+            }
+              ">
               {{ $t("operations.cancel") }}
             </button>
-            <button
-              class="button is-primary"
-              type="button"
-              @click="handleClickImportConfirm"
-            >
+            <button class="button is-primary" type="button" @click="handleClickImportConfirm">
               {{ $t("operations.confirm") }}
             </button>
           </div>
@@ -1094,7 +778,7 @@ export default {
         if (
           this.runningState.outboundToServerName[cs.outbound] &&
           typeof this.runningState.outboundToServerName[cs.outbound] !==
-            "number"
+          "number"
         ) {
           this.runningState.outboundToServerName[cs.outbound] = 1;
         }
@@ -1288,6 +972,11 @@ export default {
         hasIcon: true,
         icon: " iconfont icon-alert",
         onConfirm: () => this.deleteSelectedServers(),
+      });
+    },
+    handleClickSubUpdate() {
+      this.tableData.subscriptions.forEach((row) => {
+        this.handleClickUpdateSubscription(row);
       });
     },
     handleClickAboutConnection(row, sub) {
@@ -1584,7 +1273,7 @@ td {
   }
 
   .operate-box {
-    > * {
+    >* {
       margin-right: 0.5rem;
     }
   }
@@ -1610,6 +1299,7 @@ td {
       margin-left: 25px;
       width: calc(100% - 50px);
     }
+
     .field.is-grouped .field:not(:last-child) {
       margin-right: 0.3rem;
     }
@@ -1648,7 +1338,7 @@ td {
 }
 
 .tabs {
-  .icon + span {
+  .icon+span {
     color: #ff6719; //方案1
   }
 
@@ -1679,6 +1369,7 @@ tr.is-connected-not-running {
   from {
     transform: rotate(0deg);
   }
+
   to {
     transform: rotate(360deg);
   }
@@ -1717,6 +1408,7 @@ table th {
 }
 
 $coverBackground: rgba(0, 0, 0, 0.6);
+
 .tag-cover {
   height: 100%;
   width: 100%;
@@ -1753,7 +1445,7 @@ $coverBackground: rgba(0, 0, 0, 0.6);
   }
 }
 
-.b-sidebar.node-status-sidebar-reduced > .sidebar-content.is-fixed {
+.b-sidebar.node-status-sidebar-reduced>.sidebar-content.is-fixed {
   z-index: 1;
   left: 1px;
   top: 4.25rem;
@@ -1763,7 +1455,7 @@ $coverBackground: rgba(0, 0, 0, 0.6);
   border-radius: 4px;
 }
 
-.b-sidebar.node-status-sidebar > .sidebar-content.is-fixed {
+.b-sidebar.node-status-sidebar>.sidebar-content.is-fixed {
   left: 1px;
   top: 4.25rem;
   background-color: white;
@@ -1806,17 +1498,20 @@ tr.highlight-row-disconnected {
 .click-through {
   pointer-events: none;
 }
+
 .address-column {
   max-width: 350px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
 }
+
 .latency-column {
   max-width: 120px !important;
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap;
 }
+
 .latency-valid {
   color: green;
 }
@@ -1825,6 +1520,7 @@ tr.highlight-row-disconnected {
   .latency-column {
     max-width: 70px !important;
   }
+
   .address-column {
     max-width: 150px !important;
   }

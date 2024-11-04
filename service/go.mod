@@ -14,6 +14,7 @@ require (
 	github.com/dgrijalva/jwt-go/v4 v4.0.0-preview1
 	github.com/gin-contrib/cors v1.6.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/go-leo/slicex v1.0.14
 	github.com/golang/protobuf v1.5.3
 	github.com/google/gopacket v1.1.19
 	github.com/gorilla/websocket v1.5.0
@@ -41,6 +42,7 @@ require (
 	github.com/vearutop/statigz v1.1.7
 	go.etcd.io/bbolt v1.3.8
 	golang.org/x/net v0.23.0
+	golang.org/x/sync v0.4.0
 	golang.org/x/sys v0.18.0
 	google.golang.org/grpc v1.57.1
 	google.golang.org/protobuf v1.33.0
@@ -58,7 +60,6 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.3 // indirect
 	github.com/gin-contrib/sse v0.1.0 // indirect
-	github.com/go-leo/slicex v1.0.14 // indirect
 	github.com/go-ole/go-ole v1.3.0 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
 	github.com/go-playground/universal-translator v0.18.1 // indirect
